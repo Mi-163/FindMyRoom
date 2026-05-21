@@ -1,0 +1,90 @@
+import Link from "next/link";
+import { fetchHotelReviews } from "@/lib/aggregator";
+
+export default async function HotelDetails({
+    params,
+}: {
+    params: Promise<{ id: string }>;
+}) {
+    const resolvedParams = await params;
+    const hotelId = resolvedParams.id;
+
+    // Fetch the reviews from our new engine
+    const { globalReviews, localReviews } = await fetchHotelReviews(hotelId);
+
+    return (
+        <div className="min-h-screen bg-gray-50 p-6 md:p-10 pt-24">
+            <div className="max-w-6xl mx-auto">
+
+                <div className="mb-6">
+                    <Link href="/search" className="text-blue-600 hover:underline font-medium">
+                        &larr; Back to Search Results
+                    </Link>
+                </div>
+
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
+                    <h1 className="text-3xl font-bold text-slate-800">
+                        Property Insights
+                    </h1>
+                    <p className="text-gray-500 mt-2">
+                        Comparing global aggregator data with verified local experiences for ID: {hotelId}
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                    {/* Left Window: Global Platform Reviews */}
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 h-[600px] overflow-y-auto">
+                        <div className="sticky top-0 bg-white pb-4 border-b mb-4">
+                            <h2 className="text-xl font-bold text-slate-800 flex justify-between items-center">
+                                Global Platform Reviews
+                                <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">Booking.com API</span>
+                            </h2>
+                        </div>
+
+                        <div className="flex flex-col gap-4">
+                            {globalReviews.length > 0 ? globalReviews.map((review: any) => (
+                                <div key={review.id} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <span className="font-semibold text-slate-700">{review.author}</span>
+                                        <span className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded">⭐ {review.score}</span>
+                                    </div>
+                                    <h4 className="font-medium text-slate-800 text-sm mb-1">{review.title}</h4>
+                                    <p className="text-sm text-gray-600 line-clamp-3">{review.text}</p>
+                                    <p className="text-xs text-gray-400 mt-2">{review.date}</p>
+                                </div>
+                            )) : (
+                                <p className="text-gray-500 text-center mt-10">No global reviews available.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Right Window: Local Authenticated Ratings */}
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 h-[600px] overflow-y-auto border-t-4 border-t-pink-500">
+                        <div className="sticky top-0 bg-white pb-4 border-b mb-4">
+                            <h2 className="text-xl font-bold text-slate-800 flex justify-between items-center">
+                                Local Authenticated Ratings
+                                <span className="text-sm bg-pink-100 text-pink-800 px-2 py-1 rounded">FindMyRoom Data</span>
+                            </h2>
+                        </div>
+
+                        <div className="flex flex-col gap-4">
+                            {localReviews.map((review: any) => (
+                                <div key={review.id} className="p-4 bg-pink-50 rounded-lg border border-pink-100">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <span className="font-semibold text-slate-700">{review.author}</span>
+                                        <span className="bg-pink-200 text-pink-900 text-xs font-bold px-2 py-1 rounded">⭐ {review.score}</span>
+                                    </div>
+                                    <h4 className="font-medium text-slate-800 text-sm mb-1">{review.title}</h4>
+                                    <p className="text-sm text-gray-600">{review.text}</p>
+                                    <p className="text-xs text-gray-400 mt-2">{review.date}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    );
+}
