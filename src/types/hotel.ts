@@ -7,6 +7,7 @@ export interface FindMyRoomProperty {
     name: string;
     price: number;
     currency: string;
+    city?: string;
     rating: number;
     reviewCount: number;
     imageUrl: string;

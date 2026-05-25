@@ -1,25 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { collection, addDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+// 📍 NEW: Imported auth from your firebase config
+import { db, auth } from "@/lib/firebase";
+// 📍 NEW: Imported Firebase Auth methods
+import { onAuthStateChanged, User } from "firebase/auth";
 
 export default function ReviewForm({ hotelId }: { hotelId: string }) {
+    // 📍 NEW: Auth states
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    // Existing form states
     const [author, setAuthor] = useState("");
     const [score, setScore] = useState("10");
     const [text, setText] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // use the Next.js router to instantly refresh the page data after submitting
     const router = useRouter();
+
+    // 📍 NEW: Listen for user login status on mount
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+
+            // Automatically pre-fill their Google name if they are logged in
+            if (currentUser?.displayName) {
+                setAuthor(currentUser.displayName);
+            }
+
+            setLoading(false);
+        });
+        return () => unsubscribe();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Extra security check before submitting
+        if (!user) {
+            alert("You must be logged in to submit a review.");
+            return;
+        }
+
         setIsSubmitting(true);
 
         try {
-            // Push the new data directly to your Firestore 'reviews' collection
             await addDoc(collection(db, "reviews"), {
                 hotelId: hotelId,
                 author: author,
@@ -29,12 +57,10 @@ export default function ReviewForm({ hotelId }: { hotelId: string }) {
                 date: new Date().toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' })
             });
 
-            // Clear the form fields
             setAuthor("");
             setScore("10");
             setText("");
 
-            // trigger the Server Component to re-fetch and show the new review
             router.refresh();
         } catch (error) {
             console.error("Error writing to database:", error);
@@ -44,6 +70,22 @@ export default function ReviewForm({ hotelId }: { hotelId: string }) {
         }
     };
 
+    // Show a loading skeleton while checking auth
+    if (loading) {
+        return <div className="mb-6 h-48 bg-pink-50/50 animate-pulse rounded-lg border border-pink-100"></div>;
+    }
+
+    // The Security Bouncer UI for guests
+    if (!user) {
+        return (
+            <div className="mb-6 p-6 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                <h3 className="text-sm font-bold text-slate-800 mb-2">Want to share your experience?</h3>
+                <p className="text-slate-500 text-sm">You must be logged in to leave a review for this property.</p>
+            </div>
+        );
+    }
+
+    // Existing Form UI for logged-in users
     return (
         <form onSubmit={handleSubmit} className="mb-6 p-4 bg-pink-50 rounded-lg border border-pink-200">
             <h3 className="text-sm font-bold text-pink-900 mb-3">Leave a Local Review</h3>

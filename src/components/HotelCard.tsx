@@ -3,26 +3,32 @@
 import Link from "next/link";
 import { FindMyRoomProperty } from "@/types/hotel";
 import DistanceButton from "./DistanceButton";
+import WishlistButton from "./WishlistButton"; // Imported the new button
 
 export default function HotelCard({ hotel, city }: { hotel: any, city: string }) {
     return (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
             <div className="flex flex-col md:flex-row">
+
                 {/* Image Section */}
-                <div className="md:w-1/3 h-48 md:h-auto bg-gray-200">
+                {/*  Added 'relative' to this div so the heart stays positioned over the image */}
+                <div className="md:w-1/3 h-48 md:h-auto bg-gray-200 relative">
                     <img
                         src={hotel.imageUrl}
                         alt={hotel.name}
                         className="w-full h-full object-cover"
                         onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/400x300?text=No+Image+Available" }}
                     />
+
+                    {/*  Dropped the Wishlist Button here */}
+                    <WishlistButton hotel={hotel} />
                 </div>
 
                 {/* Details Section */}
                 <div className="p-4 flex-1 flex flex-col justify-between">
                     <div>
                         <div className="flex justify-between items-start">
-                            {/*  THIS IS THE ACTIVE ROUTING LINK  */}
+                            {/* THIS IS THE ACTIVE ROUTING LINK  */}
                             <Link href={`/search/${hotel.id}?name=${encodeURIComponent(hotel.name)}&city=${encodeURIComponent(city)}`} className="block group">
                                 <h3 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition cursor-pointer">
                                     {hotel.name}
@@ -44,7 +50,7 @@ export default function HotelCard({ hotel, city }: { hotel: any, city: string })
                             </span>
                         )}
 
-                        {/*  THE DISTANCE BUTTON FIX */}
+                        {/* THE DISTANCE BUTTON FIX */}
                         {/* Placed here so it has plenty of room to expand */}
                         <div className="mt-2 w-full">
                             <DistanceButton hotelName={hotel.name} city={city} />
