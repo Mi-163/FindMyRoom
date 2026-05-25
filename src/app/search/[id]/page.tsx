@@ -1,16 +1,24 @@
 import Link from "next/link";
 import { fetchHotelReviews } from "@/lib/aggregator";
 import ReviewForm from "@/components/ReviewForm";
+import VideoGallery from "@/components/VideoGallery";
 
 export default async function HotelDetails({
     params,
+    searchParams, //  Catch the URL parameters
 }: {
     params: Promise<{ id: string }>;
+    searchParams: Promise<{ name?: string; city?: string }>; // 👈 Define the types
 }) {
     const resolvedParams = await params;
     const hotelId = resolvedParams.id;
 
-    // Fetch the reviews from  new engine
+    //  Extract the name and city from the URL (with fallbacks just in case)
+    const resolvedSearchParams = await searchParams;
+    const hotelName = resolvedSearchParams.name || "Luxury Hotel";
+    const city = resolvedSearchParams.city || "Kochi";
+
+    // Fetch the reviews from new engine
     const { globalReviews, localReviews } = await fetchHotelReviews(hotelId);
 
     return (
@@ -25,7 +33,7 @@ export default async function HotelDetails({
 
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
                     <h1 className="text-3xl font-bold text-slate-800">
-                        Property Insights
+                        Property Insights: {hotelName} {/*  Added the real name  */}
                     </h1>
                     <p className="text-gray-500 mt-2">
                         Comparing global aggregator data with verified local experiences for ID: {hotelId}
@@ -33,7 +41,6 @@ export default async function HotelDetails({
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
                     {/* Left Window: Global Platform Reviews */}
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 h-[600px] overflow-y-auto">
                         <div className="sticky top-0 bg-white pb-4 border-b mb-4">
@@ -69,7 +76,6 @@ export default async function HotelDetails({
                             </h2>
                         </div>
 
-                        {/* INJECT THE NEW FORM HERE, PASSING THE HOTEL ID */}
                         <ReviewForm hotelId={hotelId} />
 
                         <div className="flex flex-col gap-4">
@@ -88,8 +94,13 @@ export default async function HotelDetails({
                             )}
                         </div>
                     </div>
-
                 </div>
+
+                {/*  VIDEO GALLERY PLACEMENT */}
+                <div className="mt-12 border-t border-gray-200 pt-8">
+                    <VideoGallery hotelName={hotelName} city={city} />
+                </div>
+
             </div>
         </div>
     );

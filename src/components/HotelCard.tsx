@@ -22,8 +22,8 @@ export default function HotelCard({ hotel, city }: { hotel: any, city: string })
                 <div className="p-4 flex-1 flex flex-col justify-between">
                     <div>
                         <div className="flex justify-between items-start">
-                            {/* 🚨 THIS IS THE ACTIVE ROUTING LINK 🚨 */}
-                            <Link href={`/search/${hotel.id}`} className="block group">
+                            {/*  THIS IS THE ACTIVE ROUTING LINK  */}
+                            <Link href={`/search/${hotel.id}?name=${encodeURIComponent(hotel.name)}&city=${encodeURIComponent(city)}`} className="block group">
                                 <h3 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition cursor-pointer">
                                     {hotel.name}
                                 </h3>
@@ -44,7 +44,7 @@ export default function HotelCard({ hotel, city }: { hotel: any, city: string })
                             </span>
                         )}
 
-                        {/* 📍 THE DISTANCE BUTTON FIX */}
+                        {/*  THE DISTANCE BUTTON FIX */}
                         {/* Placed here so it has plenty of room to expand */}
                         <div className="mt-2 w-full">
                             <DistanceButton hotelName={hotel.name} city={city} />
