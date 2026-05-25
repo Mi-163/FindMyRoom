@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { fetchHotelReviews } from "@/lib/aggregator";
+import ReviewForm from "@/components/ReviewForm";
 
 export default async function HotelDetails({
     params,
@@ -9,7 +10,7 @@ export default async function HotelDetails({
     const resolvedParams = await params;
     const hotelId = resolvedParams.id;
 
-    // Fetch the reviews from our new engine
+    // Fetch the reviews from  new engine
     const { globalReviews, localReviews } = await fetchHotelReviews(hotelId);
 
     return (
@@ -68,8 +69,11 @@ export default async function HotelDetails({
                             </h2>
                         </div>
 
+                        {/* INJECT THE NEW FORM HERE, PASSING THE HOTEL ID */}
+                        <ReviewForm hotelId={hotelId} />
+
                         <div className="flex flex-col gap-4">
-                            {localReviews.map((review: any) => (
+                            {localReviews.length > 0 ? localReviews.map((review: any) => (
                                 <div key={review.id} className="p-4 bg-pink-50 rounded-lg border border-pink-100">
                                     <div className="flex justify-between items-start mb-2">
                                         <span className="font-semibold text-slate-700">{review.author}</span>
@@ -79,7 +83,9 @@ export default async function HotelDetails({
                                     <p className="text-sm text-gray-600">{review.text}</p>
                                     <p className="text-xs text-gray-400 mt-2">{review.date}</p>
                                 </div>
-                            ))}
+                            )) : (
+                                <p className="text-gray-500 text-center mt-10">No local reviews yet. Be the first!</p>
+                            )}
                         </div>
                     </div>
 

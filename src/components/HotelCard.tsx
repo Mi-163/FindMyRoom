@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { FindMyRoomProperty } from "@/types/hotel";
+import DistanceButton from "./DistanceButton";
 
-export default function HotelCard({ hotel }: { hotel: FindMyRoomProperty }) {
+export default function HotelCard({ hotel, city }: { hotel: any, city: string }) {
     return (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
             <div className="flex flex-col md:flex-row">
@@ -42,13 +43,23 @@ export default function HotelCard({ hotel }: { hotel: FindMyRoomProperty }) {
                                 💕 Couple Friendly
                             </span>
                         )}
+
+                        {/* 📍 THE DISTANCE BUTTON FIX */}
+                        {/* Placed here so it has plenty of room to expand */}
+                        <div className="mt-2 w-full">
+                            <DistanceButton hotelName={hotel.name} city={city} />
+                        </div>
                     </div>
 
                     {/* Price Section */}
-                    <div className="mt-4 text-right">
+                    <div className="mt-4 text-right border-t border-gray-100 pt-3">
                         <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Best Available Rate</p>
-                        <p className="text-2xl font-bold text-slate-800">
-                            {hotel.currency} {hotel.price}
+                        <p className="text-xl font-bold text-slate-800">
+                            {new Intl.NumberFormat('en-IN', {
+                                style: 'currency',
+                                currency: hotel.currency || 'INR',
+                                maximumFractionDigits: 0
+                            }).format(hotel.price)}
                         </p>
                     </div>
                 </div>
