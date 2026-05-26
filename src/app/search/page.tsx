@@ -41,12 +41,20 @@ function evaluateCoupleFriendlyStatus(hotel: any, firebaseOverrides: Record<stri
 export default async function SearchResults({
     searchParams,
 }: {
-    searchParams: Promise<{ location: string; checkin: string; checkout: string; currency?: string; sort?: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+    // Resolve params according to Next.js 15 requirements
     const resolvedParams = await searchParams;
 
-    // 📍 THE GUARD CLAUSE: Catch missing URL parameters before hitting the API
-    if (!resolvedParams.location || !resolvedParams.checkin || !resolvedParams.checkout) {
+    // Safely extract and cast parameters
+    const location = resolvedParams.location as string | undefined;
+    const checkin = resolvedParams.checkin as string | undefined;
+    const checkout = resolvedParams.checkout as string | undefined;
+    const currency = resolvedParams.currency as string | undefined;
+    const sortParam = resolvedParams.sort as string | undefined;
+
+    //  Catch missing URL parameters before hitting the API
+    if (!location || !checkin || !checkout) {
         return (
             <div className="min-h-screen bg-gray-50 p-6 md:p-10 pt-24 flex items-center justify-center">
                 <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm text-center border border-gray-200">
@@ -60,13 +68,13 @@ export default async function SearchResults({
         );
     }
 
-    const displayCurrency = resolvedParams.currency || "INR";
+    const displayCurrency = currency || "INR";
 
     // Pass it to the engine to get the raw data
     let rawHotels = await fetchLiveHotels(
-        resolvedParams.location,
-        resolvedParams.checkin,
-        resolvedParams.checkout,
+        location,
+        checkin,
+        checkout,
         displayCurrency
     );
 
@@ -106,8 +114,6 @@ export default async function SearchResults({
     });
 
     // ARRAY SORTING ENGINE
-    const sortParam = resolvedParams.sort;
-
     if (sortParam === "price_asc") {
         hotels.sort((a: any, b: any) => a.price - b.price);
     } else if (sortParam === "price_desc") {
@@ -132,9 +138,9 @@ export default async function SearchResults({
     return (
         <FilteredHotelList
             initialHotels={hotels}
-            location={resolvedParams.location}
-            checkin={resolvedParams.checkin}
-            checkout={resolvedParams.checkout}
+            location={location}
+            checkin={checkin}
+            checkout={checkout}
         />
     );
 }
