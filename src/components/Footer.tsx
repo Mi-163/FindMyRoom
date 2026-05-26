@@ -12,7 +12,7 @@ export default function Footer() {
                 {/* Creator Branding */}
                 <div className="flex flex-col items-center gap-2">
                     <p className="text-sm font-semibold">
-                        Creator: <span className="text-blue-400">Midhun Murali</span>
+                        Made with ❤️ by  <span className="text-blue-400">Midhun Murali</span>
                     </p>
                     <div className="flex gap-6">
                         <Link href="https://github.com/Mi-163" target="_blank" className="text-gray-400 hover:text-white transition">
