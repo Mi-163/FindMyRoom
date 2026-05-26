@@ -1,8 +1,10 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
-export default function SortDropdown() {
+//  Rename the original component to an "Inner" component
+function SortDropdownInner() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -41,5 +43,15 @@ export default function SortDropdown() {
                 <option value="price_desc">Price: High to Low</option>
             </select>
         </div>
+    );
+}
+
+// Export a wrapper component with Suspense
+export default function SortDropdown() {
+    return (
+        // Added a small placeholder so the UI doesn't jump while loading
+        <Suspense fallback={<div className="h-9 w-48 bg-gray-100 rounded-lg animate-pulse border border-gray-200"></div>}>
+            <SortDropdownInner />
+        </Suspense>
     );
 }

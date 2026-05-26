@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation"; //  IMPORT SEARCHPARAMS
+import { useSearchParams } from "next/navigation";
 import DistanceButton from "./DistanceButton";
 import WishlistButton from "./WishlistButton";
 
@@ -15,15 +15,16 @@ const getSeed = (id: string) => {
     return Math.abs(Math.sin(hash));
 };
 
-export default function HotelCard({ hotel, city }: { hotel: any, city: string }) {
+//  Rename the original component to HotelCardInner
+function HotelCardInner({ hotel, city }: { hotel: any, city: string }) {
     const [showComparisons, setShowComparisons] = useState(false);
-    const searchParams = useSearchParams(); //  ACCESS CURRENT DATES
+    const searchParams = useSearchParams();
 
     // Reconstruct query parameters from current URL
     const checkin = searchParams.get("checkin") || "";
     const checkout = searchParams.get("checkout") || "";
 
-    //  THE PARITY RATE GENERATOR
+    // THE PARITY RATE GENERATOR
     const seed = getSeed(hotel.id || hotel.name);
     const mmtDiscount = 0.04 + (seed * 0.04);
     const mmtPrice = Math.round(hotel.price * (1 - mmtDiscount));
@@ -57,7 +58,7 @@ export default function HotelCard({ hotel, city }: { hotel: any, city: string })
                 <div className="p-4 flex-1 flex flex-col justify-between">
                     <div>
                         <div className="flex justify-between items-start">
-                            {/*  Append checkin and checkout to the URL */}
+                            {/* Append checkin and checkout to the URL */}
                             <Link
                                 href={`/search/${hotel.id}?name=${encodeURIComponent(hotel.name)}&city=${encodeURIComponent(city)}&checkin=${checkin}&checkout=${checkout}`}
                                 className="block group"
@@ -123,5 +124,15 @@ export default function HotelCard({ hotel, city }: { hotel: any, city: string })
                 </div>
             </div>
         </div>
+    );
+}
+
+// Export the wrapper component with Suspense
+export default function HotelCard({ hotel, city }: { hotel: any, city: string }) {
+    return (
+        // Added a skeleton loading state so the UI doesn't jump while loading
+        <Suspense fallback={<div className="bg-white border border-gray-200 rounded-xl h-64 animate-pulse"></div>}>
+            <HotelCardInner hotel={hotel} city={city} />
+        </Suspense>
     );
 }

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-export default function ChatWidget() {
+//  Rename original component to an "Inner" component
+function ChatWidgetInner() {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<{ role: "user" | "ai", text: string }[]>([]);
     const [input, setInput] = useState("");
@@ -62,13 +63,13 @@ export default function ChatWidget() {
     return (
         <div className="fixed bottom-6 right-6 z-50">
 
-            {/*   Floating Bubble Button with Hover Tooltip */}
+            {/* Floating Bubble Button with Hover Tooltip */}
             {!isOpen && (
                 <div className="relative group flex items-center justify-center">
                     {/* The Tooltip (Hidden by default, shown on hover) */}
                     <div className="absolute bottom-full right-0 mb-4 w-56 p-3 bg-slate-800 text-white text-xs text-center rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50">
                         Chat with our AI assistant here (powered by Gemini 2.5 Flash)
-                        {/*  little triangle pointing down at the button */}
+                        {/* little triangle pointing down at the button */}
                         <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-slate-800 rotate-45"></div>
                     </div>
 
@@ -156,5 +157,15 @@ export default function ChatWidget() {
                 </div>
             )}
         </div>
+    );
+}
+
+//  Export a wrapper component that safely loads the Inner component inside Suspense
+export default function ChatWidget() {
+    return (
+        // fallback={null} ensures nothing ugly renders on the screen while it loads
+        <Suspense fallback={null}>
+            <ChatWidgetInner />
+        </Suspense>
     );
 }
