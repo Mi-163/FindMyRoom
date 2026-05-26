@@ -1,5 +1,7 @@
 # FindMyRoom | Global Travel Aggregator
 
+🌍 **Live Demo:** [https://find-my-room-six.vercel.app/](https://find-my-room-six.vercel.app/)
+
 A full-stack, AI-integrated travel platform engineered to provide comprehensive hotel search, deterministic parity pricing analysis, and verified local reviews. Built with Next.js and Tailwind CSS, this platform empowers users with actionable insights for global travel planning.
 
 ## Core Features
@@ -73,7 +75,6 @@ Built with ❤️ by **Midhun Murali**
 * [GitHub](https://github.com/Mi-163)
 * [LinkedIn](https://linkedin.com/in/midhun-p-m-96551a291)
 * [Instagram](https://www.instagram.com/mpm_163?igsh=MjY4cndwOGQ3eXg2)
-
 
 ---
 © 2026 FindMyRoom. All rights reserved.
