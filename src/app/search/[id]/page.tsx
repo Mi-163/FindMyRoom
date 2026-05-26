@@ -10,7 +10,7 @@ export default async function HotelDetails({
     searchParams,
 }: {
     params: Promise<{ id: string }>;
-    searchParams: Promise<{ name?: string; city?: string }>;
+    searchParams: Promise<{ name?: string; city?: string; location?: string; checkin?: string; checkout?: string }>;
 }) {
     const resolvedParams = await params;
     const hotelId = resolvedParams.id;
@@ -18,6 +18,18 @@ export default async function HotelDetails({
     const resolvedSearchParams = await searchParams;
     const hotelName = resolvedSearchParams.name || "Luxury Hotel";
     const city = resolvedSearchParams.city || "Kochi";
+
+    // Extract search context for the back button
+    const location = resolvedSearchParams.location || city;
+    const checkin = resolvedSearchParams.checkin || "";
+    const checkout = resolvedSearchParams.checkout || "";
+
+    // Build the query string for the back button
+    const backQuery = new URLSearchParams({
+        location: location,
+        checkin: checkin,
+        checkout: checkout
+    }).toString();
 
     // Fetch the reviews from new engine
     const { globalReviews, localReviews } = await fetchHotelReviews(hotelId);
@@ -27,7 +39,8 @@ export default async function HotelDetails({
             <div className="max-w-6xl mx-auto">
 
                 <div className="mb-6">
-                    <Link href="/search" className="text-blue-600 hover:underline font-medium">
+                    {/* Pass the reconstructed query parameters back to the search page */}
+                    <Link href={`/search?${backQuery}`} className="text-blue-600 hover:underline font-medium">
                         &larr; Back to Search Results
                     </Link>
                 </div>
@@ -43,10 +56,8 @@ export default async function HotelDetails({
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Left Window: Global Platform Reviews */}
-                    {/*  Removed p-6 from the outer container */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 h-[600px] overflow-y-auto">
 
-                        {/*  Added p-6 to the sticky header so it touches the absolute top edge */}
                         <div className="sticky top-0 bg-white p-6 pb-4 border-b z-10 shadow-sm">
                             <h2 className="text-xl font-bold text-slate-800 flex justify-between items-center">
                                 Global Platform Reviews
@@ -54,7 +65,6 @@ export default async function HotelDetails({
                             </h2>
                         </div>
 
-                        {/*  Added padding back to the content wrapper so it still looks beautiful */}
                         <div className="flex flex-col gap-4 px-6 pb-6 pt-2">
                             {globalReviews.length > 0 ? globalReviews.map((review: any) => (
                                 <div key={review.id} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
@@ -75,10 +85,8 @@ export default async function HotelDetails({
                     </div>
 
                     {/* Right Window: Local Authenticated Ratings */}
-                    {/*  Removed p-6 from the outer container */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 h-[600px] overflow-y-auto border-t-4 border-t-pink-500">
 
-                        {/*  Pushed sticky to the absolute ceiling */}
                         <div className="sticky top-0 bg-white p-6 pb-4 border-b z-10 shadow-sm">
                             <h2 className="text-xl font-bold text-slate-800 flex justify-between items-center">
                                 Local Authenticated Ratings
@@ -86,7 +94,6 @@ export default async function HotelDetails({
                             </h2>
                         </div>
 
-                        {/*  Wrapped the rest of the components in a padded content box */}
                         <div className="px-6 pb-6 pt-4">
                             <div className="mb-6">
                                 <CoupleFriendlyVote hotelId={hotelId} />
@@ -115,7 +122,6 @@ export default async function HotelDetails({
                     </div>
                 </div>
 
-                {/* VIDEO GALLERY PLACEMENT */}
                 <div className="mt-12 border-t border-gray-200 pt-8">
                     <VideoGallery hotelName={hotelName} city={city} />
                 </div>
