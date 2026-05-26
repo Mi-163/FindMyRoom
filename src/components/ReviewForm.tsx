@@ -3,34 +3,27 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { collection, addDoc } from "firebase/firestore";
-// 📍 NEW: Imported auth from your firebase config
 import { db, auth } from "@/lib/firebase";
-// 📍 NEW: Imported Firebase Auth methods
 import { onAuthStateChanged, User } from "firebase/auth";
 
 export default function ReviewForm({ hotelId }: { hotelId: string }) {
-    // 📍 NEW: Auth states
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Existing form states
     const [author, setAuthor] = useState("");
-    const [score, setScore] = useState("10");
+    // 📍 FIXED: Default score is now 5
+    const [score, setScore] = useState("5");
     const [text, setText] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const router = useRouter();
 
-    // 📍 NEW: Listen for user login status on mount
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
-
-            // Automatically pre-fill their Google name if they are logged in
             if (currentUser?.displayName) {
                 setAuthor(currentUser.displayName);
             }
-
             setLoading(false);
         });
         return () => unsubscribe();
@@ -39,7 +32,6 @@ export default function ReviewForm({ hotelId }: { hotelId: string }) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Extra security check before submitting
         if (!user) {
             alert("You must be logged in to submit a review.");
             return;
@@ -58,7 +50,7 @@ export default function ReviewForm({ hotelId }: { hotelId: string }) {
             });
 
             setAuthor("");
-            setScore("10");
+            setScore("5");
             setText("");
 
             router.refresh();
@@ -70,12 +62,10 @@ export default function ReviewForm({ hotelId }: { hotelId: string }) {
         }
     };
 
-    // Show a loading skeleton while checking auth
     if (loading) {
         return <div className="mb-6 h-48 bg-pink-50/50 animate-pulse rounded-lg border border-pink-100"></div>;
     }
 
-    // The Security Bouncer UI for guests
     if (!user) {
         return (
             <div className="mb-6 p-6 bg-slate-50 border border-slate-200 rounded-lg text-center">
@@ -85,7 +75,6 @@ export default function ReviewForm({ hotelId }: { hotelId: string }) {
         );
     }
 
-    // Existing Form UI for logged-in users
     return (
         <form onSubmit={handleSubmit} className="mb-6 p-4 bg-pink-50 rounded-lg border border-pink-200">
             <h3 className="text-sm font-bold text-pink-900 mb-3">Leave a Local Review</h3>
@@ -99,16 +88,13 @@ export default function ReviewForm({ hotelId }: { hotelId: string }) {
                     onChange={(e) => setAuthor(e.target.value)}
                     className="flex-1 p-2 text-sm border rounded outline-none focus:border-pink-400 text-black"
                 />
+
+
                 <select
                     value={score}
                     onChange={(e) => setScore(e.target.value)}
                     className="p-2 text-sm border rounded outline-none focus:border-pink-400 bg-white text-black"
                 >
-                    <option value="10">⭐ 10</option>
-                    <option value="9">⭐ 9</option>
-                    <option value="8">⭐ 8</option>
-                    <option value="7">⭐ 7</option>
-                    <option value="6">⭐ 6</option>
                     <option value="5">⭐ 5</option>
                     <option value="4">⭐ 4</option>
                     <option value="3">⭐ 3</option>

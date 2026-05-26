@@ -80,7 +80,7 @@ export async function fetchLiveHotels(
             ];
         }
 
-        // Extract the unique ID from the first result (Duplicates removed!)
+        // Extract the unique ID from the first result (Duplicates removed)
         const destId = destData?.data?.[0]?.dest_id;
         const searchType = destData?.data?.[0]?.search_type || "CITY";
 
@@ -88,7 +88,8 @@ export async function fetchLiveHotels(
             console.log("=== DESTINATION SEARCH PAYLOAD ===");
             console.log(JSON.stringify(destData, null, 2).substring(0, 500));
             console.log("==================================");
-            console.error("Could not find a destination ID for this location.");
+            // 📍 FIXED: Downgraded to warn to prevent Next.js Red Screen of Death
+            console.warn("Could not find a destination ID for this location. Returning empty array.");
             return [];
         }
 
@@ -113,6 +114,9 @@ export async function fetchLiveHotels(
                 price: cleanPrice.value,
                 currency: cleanPrice.currency,
 
+                latitude: item.property.latitude || 0,
+                longitude: item.property.longitude || 0,
+
                 rating: item.property.reviewScore || 0,
                 reviewCount: item.property.reviewCount || 0,
                 imageUrl: item.property.photoUrls?.[0] || "",
@@ -127,7 +131,7 @@ export async function fetchLiveHotels(
         console.error("Aggregator Engine Error:", error);
         console.warn("⚠️ RapidAPI Connection Failed/Timed Out! Serving Vice City fallback data.");
 
-        // The Ultimate Safety Net: If the API completely dies, the UI survives.
+        //  If the API completely dies, the UI survives.
         return [
             {
                 id: "ocean-view-vc",
@@ -153,7 +157,7 @@ export async function fetchLiveHotels(
             }
         ];
     }
-} // <-- This crucial bracket was missing to close the function
+}
 
 export async function fetchHotelReviews(hotelId: string) {
     const options = {

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { FindMyRoomProperty } from "@/types/hotel";
 import DistanceButton from "./DistanceButton";
-import WishlistButton from "./WishlistButton"; // Imported the new button
+import WishlistButton from "./WishlistButton";
 
 export default function HotelCard({ hotel, city }: { hotel: any, city: string }) {
     return (
@@ -11,7 +11,6 @@ export default function HotelCard({ hotel, city }: { hotel: any, city: string })
             <div className="flex flex-col md:flex-row">
 
                 {/* Image Section */}
-                {/*  Added 'relative' to this div so the heart stays positioned over the image */}
                 <div className="md:w-1/3 h-48 md:h-auto bg-gray-200 relative">
                     <img
                         src={hotel.imageUrl}
@@ -20,7 +19,7 @@ export default function HotelCard({ hotel, city }: { hotel: any, city: string })
                         onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/400x300?text=No+Image+Available" }}
                     />
 
-                    {/*  Dropped the Wishlist Button here */}
+                    {/* Wishlist Button */}
                     <WishlistButton hotel={hotel} />
                 </div>
 
@@ -28,30 +27,31 @@ export default function HotelCard({ hotel, city }: { hotel: any, city: string })
                 <div className="p-4 flex-1 flex flex-col justify-between">
                     <div>
                         <div className="flex justify-between items-start">
-                            {/* THIS IS THE ACTIVE ROUTING LINK  */}
+                            {/* THIS IS THE ACTIVE ROUTING LINK */}
                             <Link href={`/search/${hotel.id}?name=${encodeURIComponent(hotel.name)}&city=${encodeURIComponent(city)}`} className="block group">
                                 <h3 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition cursor-pointer">
                                     {hotel.name}
                                 </h3>
                             </Link>
 
-                            <div className="bg-blue-100 text-blue-800 text-sm font-bold px-2 py-1 rounded ml-4 shrink-0">
-                                ⭐ {hotel.rating}
+                            {/* Explicitly displaying the squashed 5-point scale */}
+                            <div className="bg-blue-100 text-blue-800 text-sm font-bold px-2 py-1 rounded ml-4 shrink-0 flex items-baseline gap-1">
+                                <span>⭐ {hotel.rating}</span>
+                                <span className="text-xs font-normal opacity-75">/ 5</span>
                             </div>
                         </div>
                         <p className="text-sm text-gray-500 mt-1">
                             {hotel.reviewCount} reviews • via {hotel.sourcePlatform}
                         </p>
 
-                        {/* Dynamic Couple Friendly Badge */}
+                        {/* Dynamic Couple Friendly Badge (Now respects the strict page.tsx data) */}
                         {hotel.isCoupleFriendly && (
                             <span className="inline-block mt-3 bg-pink-100 text-pink-700 text-xs font-semibold px-3 py-1 rounded-full">
                                 💕 Couple Friendly
                             </span>
                         )}
 
-                        {/* THE DISTANCE BUTTON FIX */}
-                        {/* Placed here so it has plenty of room to expand */}
+                        {/* THE DISTANCE BUTTON */}
                         <div className="mt-2 w-full">
                             <DistanceButton hotelName={hotel.name} city={city} />
                         </div>
