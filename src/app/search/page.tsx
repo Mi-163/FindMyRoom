@@ -4,7 +4,7 @@ import FilteredHotelList from "@/components/FilteredHotelList";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-// 📍 TRUST ALGORITHM
+//  TRUST ALGORITHM
 function evaluateCoupleFriendlyStatus(hotel: any, firebaseOverrides: Record<string, boolean>) {
     // 1. Community Override (Highest Priority)
     if (firebaseOverrides[hotel.id] !== undefined) {
